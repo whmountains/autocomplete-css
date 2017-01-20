@@ -20,7 +20,6 @@ module.exports =
   filterSuggestions: true
 
   getSuggestions: (request) ->
-    console.log('getSuggestions')
     completions = null
     scopes = request.scopeDescriptor.getScopesArray()
     isSass = hasScope(scopes, 'source.sass')
@@ -28,33 +27,27 @@ module.exports =
 
     # property value completions
     if @isCompletingValue(request)
-      console.log('property value')
       completions = @getPropertyValueCompletions(request)
 
     # psuedo-selector completions (like x:hover)
     else if @isCompletingPseudoSelector(request)
-      console.log('psuedo-selector')
       completions = @getPseudoSelectorCompletions(request)
 
     else
       # if it's SASS, then we need to support nested properties, so we handle names or tags
       if isSass and @isCompletingNameOrTag(request)
-        console.log('sass name or tag')
         completions = @getPropertyNameCompletions(request)
           .concat(@getTagCompletions(request))
       # if it's inside a styled-component, then we just add the completions
       if isStyled
-        console.log('styled property name')
         completions = @getPropertyNameCompletions(request)
           .concat(@getTagCompletions(request))
       # plain css
       else if not isSass and @isCompletingName(request)
-        console.log('plain property name')
         completions = @getPropertyNameCompletions(request)
 
 
     if not isSass and not isStyled and @isCompletingTagSelector(request)
-      console.log('tag selector')
       tagCompletions = @getTagCompletions(request)
       if tagCompletions?.length
         completions ?= []
